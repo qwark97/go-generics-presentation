@@ -1,15 +1,13 @@
 package main
 
 type User struct {
+	Name string
 }
 type Team struct {
+	ID int
 }
 
-type DBEntitiesTypes interface {
-	User | Team
-}
-
-type GenericResponse[T DBEntitiesTypes] struct {
+type GenericResponse[T any] struct {
 	dbErr    error
 	dbEntity T
 }
@@ -32,7 +30,7 @@ func parseTeam(team Team) {
 	*/
 }
 
-func queryDB[T DBEntitiesTypes]() []GenericResponse[T] {
+func queryDB[T any]() []GenericResponse[T] {
 	return make([]GenericResponse[T], 10)
 }
 
