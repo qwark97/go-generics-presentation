@@ -267,6 +267,37 @@ New concepts:
 :   * !!! ADD NEW STRUCT ACTIVITY WITH FIELD ISACTIVE, CALL QUERYDB PASSING THIS TYPE AND SHOW THAT THE activity := queryDB[Activity]() has the Activity entity with it's field !!!
 :   *
 :   * alright, we've seen a bunch of the examples of the generics
-:   * now is the time to ask a question: does the golang even need this?
+:   * now is the time to think about the question: does the golang even need this?
 :   * !!! BACK TO PRESENTATION !!!
 :   *
+
+## What does the Goopher say?
+
+.image images/survey.png
+
+&nbsp;
+
+    source: https://go.dev/blog/survey2020-results
+
+:   * What does the Goopher say?
+:   * well, actually not one but quite many of them, in a survey done in 2020 (twenty-twenty) said that the generics are the most desired feature
+:   * alright, so we know that we, community, wanted that.
+:   * but it doesn't answer the question - did we need that?
+:   * to answer that, summarize the reasons why one would like to use generics in their code
+
+## reasons why
+
+- functions that share the same logic among many simple types
+- functions that work on slices, maps and channels of any type
+- general purpose data containers
+- alternatives...
+
+:   * first, to handle functions that share the same logic among many simple types. Aritmethics is the basic example here but there can be more
+:   *
+:   * second, to handle functions that work on slices, maps and channels of any type. For example a function which will read from every channel and will return the slice with all the received elements
+:   *
+:   * next one, general purpose data containers. Thats the one from the last example. Can be pretty useful and can reduce the significant amount of code
+:   *
+:   * and the last one, the alternatives for the generics. Let me elaborate this one
+
+## Alternatives
