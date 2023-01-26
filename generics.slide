@@ -1,0 +1,272 @@
+# Generics
+What, how and why?
+
+Marcin Plata
+27 January 2023
+
+marcin.plata@softwaremind.com
+
+## Agenda
+- What are the generics?
+- How do we use it?
+- (Why) Do we need them?
+
+:   * first we'll talk about what actually generics are
+:   * we'll talk about how those are working in the go language
+:   * and we'll to talk about what aspects of the language the generics influence and what new features come with them
+:   * at the end of this section we'll also check whether the way the generics work influences the performance of the go code itself
+
+:   * 
+:   * Then, we'll see how the usage of the generics looks like in code
+:   * We'll see some of the examples of the generics
+:   * We'll focus on both the ideas when to use this feature and what syntax we need to use to do it
+:   * Also, we'll say what we can't do with the generics
+
+:   *
+:   * The last section will about the reasons why the golang even got the generics
+:   * What are the benefits from it and when we should and should not to use it
+:   * The end of this presentation I would like to use as a space for short discussion
+:   * I'm interested in your opinions, in context of your daily work and experiences with the different languages
+:   * Do we need the generics at all? I will as you this question
+:   * But that will be later, and before that let's go to the first subject of this talk
+:   *
+
+.image images/gopher.png 300 300
+
+
+## What are generics?
+
+.image images/definition.png 
+                                                                            Wikipedia
+
+:   * What are the generics?
+:   * There is a bunch of the different definitions
+:   * According to the wikipedia it looks like that
+:   * Allow not to read the wikipedia for you, here and now BUT
+:   * In other words, generics are a way of programming, where types of the entities (for example functions) don't need to be specified at the moment of the declaration but will be specified according to the usage of the entity
+:   * Which is important, its not the same as dynamical typing present in for example Python language. Those are two different subjects
+:   *
+
+## What does it mean for Go?
+
+.code src/usage1/basic.go
+
+:   * What does it mean for Go?
+:   * Well, in go, the generics are a method of using different types with the same logic, without the need of the for example copying and pasting the same function again and again with only the types changed
+:   * basic example of the usage can look like that
+:   * About the syntax itself we're going to talk about a little bit later
+:   * But I think this example is quite straightforward
+:   * We can see the definition of the `addition` function, which accepts two arguments of the type T, adds them and returns this value
+:   * And the type T can be the integer of float64
+:   * When we use this `addition` function, we call it and we explicitly say what type of the arguments we're going to use
+:   * This is called instantiation
+
+:   * 
+:   * What is important, we can be sure that the types we've used are the proper ones because this is assured by the compiler itselft
+:   * this is the example of the difference between the generics and the mentioned dynamical typing
+:   *
+
+## Partial monomorphization
+
+.image images/gophers.png 400 400
+
+&nbsp;
+
+&nbsp;
+
+    source: https://planetscale.com/blog/generics-can-make-your-go-code-slower
+
+:   * But how it happens?
+:   * To answer that question we need to say a little bit about how the generics are implemented
+:   * 
+:   * To put things straight: go implementation of the generics use someting what can be called "partial monomorphization"
+:   * To explain that, lets start with the term "monomorphization"
+:   * As scary as it sounds, its rather simple concept: when we have a function, and that function performs addition on integers and on the other hand on the floats, the compiler will replace the generic placeholder used in the source code and will produce copy of this function, one which would handle integers and one for the floats. And thats it. As a result, by the cost of the compile time, we achieve quite efficient the polymorphism. As far I know, this solution is being used for the generics implementation for example for C++ and Rust. So why the Go uses it just "partially"?
+:   * It's because, instead of working directly on the types of data, which would produce a copy of the function for each type, it creates the functions instantiations based on the uniques "GCShape of the arguments"
+:   * The GCShape of a type is an abstract concept specific to Go and the two concrete types are in the same gcshape grouping if and only if they have the same underlying type or they are both pointer types.
+:   * Therefore, the compiler needs to produce the less unique functions instantiations which improves its performance in comparition to the previously described "monomorphization"
+:   * As a support factor of this approach, the implementation uses the dictionary, which is sent as a paremeter to each generic function or method call
+:   * The dictionary provides relevant information about the type arguments that allows a single function instantiation to run correctly for many distinct type arguments.
+:   * This whole process is more formally called the implementation of generics via dictionaries and gcshape stenciling.
+:   *
+:   * Uh, that was the hardest slide in the whole presentation but I hope it gave you the overview how it works.
+:   * we won't go into more details here, because the detaild analyze of the language implementation is a way too complex subject for this particular presentation
+:   * Although, if you're interested in that I encourage you to see the article placed as a source here. It also points to the official proposals and docs
+:   * And, some of you might noticed by looking at the link, that this article puts forward the thesis that the generics can make the code slower
+:   * So, how does it look like?
+:   *
+
+## Basic usage performance
+
+.image images/message.png
+
+:   * Well, to check that we need to do some tests
+:   * We will see the basic usage of the Generics
+:   * and we will check the performance of the calls using the benchmark tool
+:   * The code of tests looks like that: 
+:   * CODE! !!!basic_benchmark DIR!!!
+:   * first, we define the functions
+:   * we will use 5 types of the adding operation
+:   * using direct implementation for each type
+:   * using type casting with the switch statement
+:   * using reflection
+:   * and using the generics one with the constraints used directly in the function declaration
+:   * and the other one with the type set
+:   * then we run the benchamrk tests
+:   * the tests itself looks like that
+:   * for each implementation we perform some number of executions
+:   * I won't run this right now !!!GO BACK TO PRESENTATION AND CHANGE SLIDE!!!
+:   *
+
+## Basic usage performance
+
+.image images/performance.png _ 900
+
+:   * but those are the results I've got when I was preparing this presentation
+:   * the slowest approach is the one with the reflection, which well, it was expected
+:   * the other ones are more or less the same
+:   * there are slight differences, but when I was running this benchark over and over again, to be honest the possitions of those remaining four were changing
+:   * therefore, the conslusion that we can come up with is that, in the most common usage example, the effect of the generics on the performance is not existing
+:   * so, why the title of this mentioned article says what it says?
+:   * well, the use case described there is really specific and involves such performance optimalizations like avoiding the interfaces for example
+:   * in such such environment, yes the generics may negatively affect the performance of the app
+:   * Although, in my opinion the edge cases can not determine the general conslusions
+:   * which can be shorten to this sentence
+:   *
+
+
+## 
+
+.image images/sentence.png
+
+:   * Influence of generics on the performance is neglectible as long as the performance isn't your highest priority
+:   * Anyway, again, I encourage you to checkout the mentioned article
+:   * But going back to our presentation
+:   *
+
+## How do we use the generics?
+
+New concepts:
+- Constraints
+- Sets of types
+- Type inference
+
+:   * How do we use the generics?
+:   * Before we dive in into some of the examples, first lets clarify some of the new concepts that generics come with
+:   * Those are:
+:   * Constraints - those are just the interfaces, which are the type parameters for functions and structs and so one
+:   * Sets of types - the name of the concept is quite self explanatory but we can add to this that also the types which don't have the methods can be a part of those
+:   * And Type inference - which is permission to ommit the explicite usage of the type arguments when calling the generic function
+:   *
+:   * Lets see this as a code !!!NEXT SLIDE!!!
+:   *
+
+
+## How do we use the generics?
+
+.code src/usage2/concepts.go
+
+:   * Here we have the Constraints
+:   * Here we have the sets of types
+:   * and the type inference looks like that
+:   * this is the explicite one and also the implicte one
+:   *
+
+## How do we use the generics?
+
+.code src/usage3/pipeAndTilde.go
+
+:   * when we analyze it closer we can talk about two more syntax things here
+:   * pipe mark in the generics usage serves as an union sign
+:   * it means, that the value which uses constraint as a type will have only those options that are available for all other types that are a part of the constraint
+:   * the same is about the sets of types - only the options that are a part of the each type will be available
+:   *
+:   * The tilde mark in the generics usage is a token which says in this example more or less: the type int and the all types whoose the underlying type is an int
+:   * What is interesting, it works despite of the number of layers. Therefore, this GenericFunc will accept the values with the types int, CoolNumber and also CoolerNumber apart from the others used as a constraints
+:   * 
+:   * Alright, we've described the new syntax so lets see the code
+:   * I've tried to came up with some interesting examples of the usage of the generics and now I'd like to walk through those
+:   *
+
+## How do we use the generics?
+
+.image images/message.png
+
+:   * now, lets dive into the code and see some examples
+:   * !!!EXAMPLE 1!!!the simplest example, classic function which takes different types and does something with it. We can see here that variadic functions also can be generic. Here, we also can see the usage of the new package that comes with the generics update. It comes with some useful, predefined type sets. Execution of this example looks as follows, nothing unexpected
+
+:   *
+:   * alright, as we are here, lets focus on the constraints for a bit. What can be a constraint?
+:   *
+:   * Can the function be a constraint? Why not: !!!EXAMPLE 2!!! .
+:   * As we can see, the compiler doesn't have any objections. We cannot use the type inference but its okay, thats acceptable, right?. Unfortunately, the problems arise when we want to actually use the passed parameter !!!EXAMPLE 3!!!. 
+:   * We cannot do it, at least not this way. And afterall, it makes sense - as the signatures differs from each other, the usage of those funcions slash arguments would be different, right?. And on the other hand, for passing a different functions with the same signature we don't need the generics. Golang already could do that before the version 1.18. 
+:   * BUT? Do we really cannot do it?
+:   * Lets see the next example !!!EXAMPLE 4!!!. A little bit obscure, isn't? We can see here 3 constraints !!!HIGHLIGHT THEM!!!. In the usage phase, we also can see that the types inference started working. Great! In this example we see functions with different signatures but still the number of the parameters is the same. I haven't checked whether it is possible to do a generic function which would accept a totally different functions as a parameters. And to be honest, even if this is possible I don't think this is a good idea. One of the major golang adventages is the readability. Is this code readable? Weeell I kind a doubt it. Is it usefull? It depends. This code is alike to the decorator pattern, at least to the python's flavor of it. But it doesn't mean that this is still a good idea to use it. Nevertheless, as you can see, it is possible and it works like that: go run examples/example4/main.go 
+
+:   *
+:   * What else can we say about the constraints?
+:   * !!!EXAMPLE 5!!! Unfortunately, the error type cannot be used as a constraint alongside the other types. IDE says that it is because "error contains methods" !!!SHOW VS CODE ERROR!!!
+:   * However, this message is a bit missleading. In this example !!!EXAMPLE 6!!! we see the type set which includes the types (structs) which all have methods and still can be used as a constraint. So what is this about?
+:   * Well, if we think about it a bit more, we can see why is that and by the way, we can see the purpose of the generics at all.
+:   * To be able to force a set of methods for an argument we already had a tool for that. Those are the interfaces. This is their purpose. However, the change that came with the generics implementation, extends the interfaces usage from set of required methods to the set of possible types. Interface which is focused on types is called Type Set. This difference, this putting more pressure on the types - thats the core of the generics. And thats the reason why the "error type" is not allowed in the union with any other type in the type set. Its because, beneath the "error type" is just an interface. And, the interfaces cannot be used in union in the type set !!!EXAMPLE 7!!!.
+
+:   *
+:   * Alright, so can we do anything else in context of the "classic" interfaces and the type sets? Yep! We can combine them !!!EXAMPLE 8!!!
+:   * We can see here the interface which defines some method AND the also is a type set. Therefore we must use it as a constraint
+:   * What it gives us? First, as for the regular interface, the argument passed to the genericFunction must have the proper method implemented which will be available to use in the function. And the second, the arguments that are passed to the function have the features of the types beneath them. Which in this context means, that can be compared to each others, because both int and string can be compared
+:   * !!!EXAMPLE 9!!!
+:   * If we mix for example int, which can be compared and some struct which cannot be compared in this way, we loose the possibility to use the operands on the values of constrains type
+:   *
+:   * Alright, so at this point, lets summarize the constraints !!!BACK TO PRESENTATION!!!
+:   *
+
+## Constraints
+
+- Anything can be constraint (simple types, structs, functions, interfaces)
+- Not anything can be in an union in constraint (interfaces)
+- Putting functions into constrains is possible but it might not be the best idea
+- The argument with the constrains type will be able to do all operations that are common for all the constrains in the type set
+- There is possibility to combine type sets behavior with regular interfaces behavior
+- If you need a methods from passed argument use interface rather than generics
+
+:   * Anything can be constraint (simple types, structs, functions, interfaces) BUT
+:   * Not anything can be in an union in constraint (interfaces cannot be)
+:   * Putting functions into constrains might be possible BUT it is not be the best idea due to readability of the code
+:   * The argument with the constrains type will be able to do all operations that are common for all the constrains in the type set. It means that if I add the custom struct to the type sets with int and string, I won't be able to compare them using the operands
+:   * There is possibility to combine type sets behavior with regular interfaces behavior. Although, in my opinion, the use cases for such implementation seems to be rather unlikely
+:   * If you need a methods from passed argument use interface rather than generics. Constraints are not for that
+
+:   *
+:   * Alright, we clarified this, so lets go back to the code and see some of the other examples of the generics and how those can be useful !!!NEXT SLIDE AND EXAMPLE 10!!!
+:   *
+
+## How do we use the generics?
+
+.image images/message.png
+
+:   * Here we can see the example of using the generics code as some kind of iterable value. Thats pretty useful because we can have one function which will handle iterables with different types
+:   * !!! EXAMPLE 11!!! What is even more interesting, there is possibility to make that function usable for all the lists. To do that, we can use the interface type or - as the go 1.18 introduces an alias for it - the "any" type
+:   * Such function looks like that and the execution of it is as follows: go run examples/example11/main.go
+
+:   *
+:   * until now, I was showing you only the functions and their usage as the generic ones
+:   * what about the structs and the methods on the structs?
+:   * of course its possible and it looks like that !!! EXAMPLE 12 !!!
+:   *
+:   * during declaration of the struct we need to provide the constraints
+:   * additionally, each method needs the syntax sugar to be related with the types used in the declaration
+:   * differently than with the functions, the usage of the generic structs always (or at least I think it always) needs explicit type inference
+:   * This particular example, in my opinion gives a hint to the one of the use cases where the generics are the most useful. It is as a general data container. 
+:   * Ask yourself a question: how many times you needed to copy and paste the method which fetch the different data from the database? Logic and signature for that where more or less the same: some directions of the source of the data, some filter, maybe also the context. The function would just fetch the data and return the value with the for example some indicator whether the process suceeded or not
+:   * Without the generics, each entity would need the different function. The same logic of preparing for the query, querying and preparing the results. Copy and paste, again and again
+:   * With the generics it can be done once and for all future types
+:   *
+:   * This code is really simple example of how it could look like
+:   * And if I would like to add new entity? Easy
+:   * !!! ADD NEW STRUCT ACTIVITY WITH FIELD ISACTIVE, CALL QUERYDB PASSING THIS TYPE AND SHOW THAT THE activity := queryDB[Activity]() has the Activity entity with it's field !!!
+:   *
+:   * alright, we've seen a bunch of the examples of the generics
+:   * now is the time to ask a question: does the golang even need this?
+:   * !!! BACK TO PRESENTATION !!!
+:   *
