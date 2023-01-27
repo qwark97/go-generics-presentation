@@ -285,7 +285,7 @@ New concepts:
 :   * but it doesn't answer the question - did we need that?
 :   * to answer that, summarize the reasons why one would like to use generics in their code
 
-## reasons why
+## Reasons why
 
 - functions that share the same logic among many simple types
 - functions that work on slices, maps and channels of any type
@@ -294,10 +294,58 @@ New concepts:
 
 :   * first, to handle functions that share the same logic among many simple types. Aritmethics is the basic example here but there can be more
 :   *
-:   * second, to handle functions that work on slices, maps and channels of any type. For example a function which will read from every channel and will return the slice with all the received elements
+:   * second, to handle functions that work on slices, maps and channels of any type. For example a function which would read from every channel and would return the slice with all the received elements
 :   *
-:   * next one, general purpose data containers. Thats the one from the last example. Can be pretty useful and can reduce the significant amount of code
+:   * next one, general purpose data containers. Thats the one from the last example. It can be pretty useful and can reduce significantly the amount of code
 :   *
 :   * and the last one, the alternatives for the generics. Let me elaborate this one
 
 ## Alternatives
+
+:   * well, most of the described use cases could be done befere the generics
+:   * sometimes using the interface type as an argument type
+:   * sometimes using the type assertion or type casting with switch statement
+:   * also, there is possibility to use the reflection for that
+:   * BUT
+:   * none of those methods gives us confidence that everything is okay on the compile time
+:   * type assertion can even cause the app to panic if implemented inproperly
+:   * reflect on the other hand is generally speaking not efficient and - thats my personal opinion - kind a weird
+:   *
+:   * last alternative, the most straightforward is just to write more code for different types
+:   * but it could cause the significant code base groth. 
+:   * The more code, the easier is to introduce a bug and also the maintanance becomes more difficult
+:   * of course there are possibilities to generate that code but I don't think this the solution for the issues I've mentioned
+:   *
+
+## But there are drawbacks
+
+:   * all of that doesn't mean that the generics don't have any drawbacks
+:   * the syntax is well, different
+:   * maybe it's because the feature is not long enough yet, but in my opinion it disrupts the readability of the code, at least now
+:   * I think using the generics, even if the intentions may be pure, its easy to make the code really unclear
+:   * also, the development, the adoption of the generics in the build in libraries doesn't seem like its happening. 
+:   * Maybe there are some actions, but almost a year after the release of the go 1.18, the packages like "strings" or "math" don't have any of the generics features
+:   * so what about the concusion?
+
+## Personal thoughts
+
+:   * In my opinion, it's a simillar case as with the channels when their were added
+:   * For now we, as a community, don't know yet when to use this
+:   * We've got a new toy, and we're trying to figure it out
+:   * Probably, during this stage we will use it in many cases when we shouldn't do it
+:   * But at some point, we will define some patterns and good practices for the language, that will naturally utilize the feature.
+:   * Are the generics really that important thing for the go? I don't think so. 
+:   * I'm pretty sure, that many of us will write good, quality code for an year and will not use the generics even once.
+:   * But, on the other hand, I also think that this is a good step in the language development which can improve the general usability of the Golang without losing anything
+
+
+## What about you?
+
+**Do we need them?**
+
+:   * and what about you?
+:   * I'm comming back to the question from the beginning of my presentation. Do we need the generics?
+:   * I hope we can exchange some thoughts about that.
+:   * In the mean time, when you think about the answer, I thank you for your attention and I hope this talk gave you at least one bit of new information
+:   * <NEXT, THE LAST SLIDE>
+:   *
