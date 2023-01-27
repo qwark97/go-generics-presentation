@@ -302,6 +302,10 @@ New concepts:
 
 ## Alternatives
 
+.image images/alternatives.png 500 500
+
+                                                                            DALL-E visualization of the Go mascot
+
 :   * well, most of the described use cases could be done befere the generics
 :   * sometimes using the interface type as an argument type
 :   * sometimes using the type assertion or type casting with switch statement
@@ -317,7 +321,9 @@ New concepts:
 :   * of course there are possibilities to generate that code but I don't think this the solution for the issues I've mentioned
 :   *
 
-## But there are drawbacks
+## 
+
+.image images/drawbacks.png 
 
 :   * all of that doesn't mean that the generics don't have any drawbacks
 :   * the syntax is well, different
@@ -327,7 +333,9 @@ New concepts:
 :   * Maybe there are some actions, but almost a year after the release of the go 1.18, the packages like "strings" or "math" don't have any of the generics features
 :   * so what about the concusion?
 
-## Personal thoughts
+## 
+
+.image images/thoughts.png 
 
 :   * In my opinion, it's a simillar case as with the channels when their were added
 :   * For now we, as a community, don't know yet when to use this
@@ -339,9 +347,9 @@ New concepts:
 :   * But, on the other hand, I also think that this is a good step in the language development which can improve the general usability of the Golang without losing anything
 
 
-## What about you?
+## 
 
-**Do we need them?**
+.image images/you.png
 
 :   * and what about you?
 :   * I'm comming back to the question from the beginning of my presentation. Do we need the generics?
