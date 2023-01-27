@@ -13,7 +13,7 @@ marcin.plata@softwaremind.com
 
 :   * first we'll talk about what actually generics are
 :   * we'll talk about how those are working in the go language
-:   * and we'll to talk about what aspects of the language the generics influence and what new features come with them
+:   * and we'll talk about what aspects of the language the generics influence and what new features come with them
 :   * at the end of this section we'll also check whether the way the generics work influences the performance of the go code itself
 
 :   * 
@@ -24,7 +24,7 @@ marcin.plata@softwaremind.com
 
 :   *
 :   * The last section will about the reasons why the golang even got the generics
-:   * What are the benefits from it and when we should and should not to use it
+:   * What are the benefits from it and when we should use it
 :   * The end of this presentation I would like to use as a space for short discussion
 :   * I'm interested in your opinions, in context of your daily work and experiences with the different languages
 :   * Do we need the generics at all? I will as you this question
@@ -81,7 +81,7 @@ marcin.plata@softwaremind.com
 :   * 
 :   * To put things straight: go implementation of the generics use someting what can be called "partial monomorphization"
 :   * To explain that, lets start with the term "monomorphization"
-:   * As scary as it sounds, its rather simple concept: when we have a function, and that function performs addition on integers and on the other hand on the floats, the compiler will replace the generic placeholder used in the source code and will produce copy of this function, one which would handle integers and one for the floats. And thats it. As a result, by the cost of the compile time, we achieve quite efficient the polymorphism. As far I know, this solution is being used for the generics implementation for example for C++ and Rust. So why the Go uses it just "partially"?
+:   * As scary as it sounds, its rather simple concept: when we have a function, and that function performs addition on integers and on the other hand on the floats, the compiler will replace the generic placeholder used in the source code and will produce copy of this function, one which would handle integers and one for the floats. And thats it. As a result, by the cost of the compile time, we achieve quite efficient polymorphism. As far I know, this solution is being used for the generics implementation for example for C++ and Rust. So why the Go uses it just "partially"?
 :   * It's because, instead of working directly on the types of data, which would produce a copy of the function for each type, it creates the functions instantiations based on the uniques "GCShape of the arguments"
 :   * The GCShape of a type is an abstract concept specific to Go and the two concrete types are in the same gcshape grouping if and only if they have the same underlying type or they are both pointer types.
 :   * Therefore, the compiler needs to produce the less unique functions instantiations which improves its performance in comparition to the previously described "monomorphization"
@@ -154,9 +154,9 @@ New concepts:
 :   * How do we use the generics?
 :   * Before we dive in into some of the examples, first lets clarify some of the new concepts that generics come with
 :   * Those are:
-:   * Constraints - those are just the interfaces, which are the type parameters for functions and structs and so one
+:   * Constraints - those are just the interfaces, which are the type parameters for functions and structs
 :   * Sets of types - the name of the concept is quite self explanatory but we can add to this that also the types which don't have the methods can be a part of those
-:   * And Type inference - which is permission to ommit the explicite usage of the type arguments when calling the generic function
+:   * And Type inference - which is a possibility to ommit the explicite usage of the type arguments when calling the generic function. The type inference has been in the language before for example during declaring the variable with the colon equal signs but in context of the figuring out the functions parameter's type this is a new thing
 :   *
 :   * Lets see this as a code !!!NEXT SLIDE!!!
 :   *
@@ -169,7 +169,6 @@ New concepts:
 :   * Here we have the Constraints
 :   * Here we have the sets of types
 :   * and the type inference looks like that
-:   * this is the explicite one and also the implicte one
 :   *
 
 ## How do we use the generics?
@@ -256,7 +255,8 @@ New concepts:
 :   *
 :   * during declaration of the struct we need to provide the constraints
 :   * additionally, each method needs the syntax sugar to be related with the types used in the declaration
-:   * differently than with the functions, the usage of the generic structs always (or at least I think it always) needs explicit type inference
+:   * the methods itself cannot be additionaly the generic ones
+:   * differently than with the functions, the usage of the generic structs always (or at least I think it always) needs explicit type. The type inference doesn't work here
 :   * This particular example, in my opinion gives a hint to the one of the use cases where the generics are the most useful. It is as a general data container. 
 :   * Ask yourself a question: how many times you needed to copy and paste the method which fetch the different data from the database? Logic and signature for that where more or less the same: some directions of the source of the data, some filter, maybe also the context. The function would just fetch the data and return the value with the for example some indicator whether the process suceeded or not
 :   * Without the generics, each entity would need the different function. The same logic of preparing for the query, querying and preparing the results. Copy and paste, again and again
@@ -331,7 +331,7 @@ New concepts:
 :   * I think using the generics, even if the intentions may be pure, its easy to make the code really unclear
 :   * also, the development, the adoption of the generics in the build in libraries doesn't seem like its happening. 
 :   * Maybe there are some actions, but almost a year after the release of the go 1.18, the packages like "strings" or "math" don't have any of the generics features
-:   * so what about the concusion?
+:   * so what about the conclusion?
 
 ## 
 
